@@ -3,6 +3,10 @@
 ## 📌 Project Overview  
 This project analyzes **Walmart sales data** (Kaggle dataset) to uncover transactional patterns, customer behavior, and product performance. The goal is to demonstrate SQL proficiency in data cleaning, exploratory analysis, and business intelligence-driven queries.
 
+![9855345](https://github.com/user-attachments/assets/c16088a4-6cd5-4d25-ab2a-5273d0d880f4)
+
+
+
 ---
 
 ## 🛠️ Tools Used  
