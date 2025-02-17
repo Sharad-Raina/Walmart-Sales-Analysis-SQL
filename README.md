@@ -1,11 +1,9 @@
-# Walmart Sales Analysis - SQL Data Exploration Project
+# Walmart Sales Analysis - SQL + Tableau Data Exploration Project
 
 ## 📌 Project Overview  
 This project analyzes **Walmart sales data** (Kaggle dataset) to uncover transactional patterns, customer behavior, and product performance. The goal is to demonstrate SQL proficiency in data cleaning, exploratory analysis, and business intelligence-driven queries.
 
-![9855345](https://github.com/user-attachments/assets/c16088a4-6cd5-4d25-ab2a-5273d0d880f4)
-
-
+<img width="1090" alt="Screenshot 2025-02-17 at 3 35 21 PM" src="https://github.com/user-attachments/assets/5b254abe-737b-4b83-aa7f-6ff418c4358a" />
 
 ---
 
@@ -39,6 +37,19 @@ This project analyzes **Walmart sales data** (Kaggle dataset) to uncover transac
 
 ---
 
+## 📈 Interactive Dashboard  
+Explore the interactive **Walmart Sales Dashboard** built using **Tableau**, which visualizes key insights, customer behavior, and product performance across multiple dimensions.
+
+[**View Dashboard**](https://public.tableau.com/views/WallmartSalesDashboard_17398211443500/Dashboard2?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
+
+### Dashboard Highlights
+- **Sales Trends:** Hourly, daily, and monthly revenue patterns across branches.  
+- **Customer Insights:** Gender preferences, member vs. non-member contributions, and city-wise customer segmentation.  
+- **Product Performance:** Market share of product lines by city and most popular product categories.  
+- **Operational Metrics:** Payment method preferences, branch-wise efficiency, and bulk purchase impact.  
+
+---
+
 ## 💡 Technical Skills Demonstrated  
 - **Complex Joins**: Multi-layered CTEs for hierarchical calculations  
 - **Time Intelligence**: `DATEPART` for hourly/monthly trend extraction  
@@ -47,64 +58,63 @@ This project analyzes **Walmart sales data** (Kaggle dataset) to uncover transac
 - **Data Type Handling**: Conversion/casting for percentage metrics  
 
 ---
+
 ## 🔍 SQL Code Highlights  
 
 ### 1. **Monthly Sales Growth Calculation**  
 ```sql
 -- CTE + Window Function for MoM Growth
 WITH monthly_sales AS (
-    SELECT 
-        Branch, 
+    SELECT
+        Branch,
         DATEPART(MONTH, [Date]) AS Month,
-        ROUND(SUM(Total), 2) AS Monthly_Total, 
+        ROUND(SUM(Total), 2) AS Monthly_Total,
         LAG(SUM(Total)) OVER (
-            PARTITION BY Branch 
+            PARTITION BY Branch
             ORDER BY DATEPART(MONTH, [Date])
-        ) AS Previous_Month_Total 
+        ) AS Previous_Month_Total
     FROM dbo.[WalmartSalesData.csv]
     GROUP BY Branch, DATEPART(MONTH, [Date])
 )
-SELECT 
-    Branch, 
-    Month, 
-    Monthly_Total, 
-    CASE 
-        WHEN Previous_Month_Total = 0 THEN 0 
+SELECT
+    Branch,
+    Month,
+    Monthly_Total,
+    CASE
+        WHEN Previous_Month_Total = 0 THEN 0
         ELSE ROUND(
-            ((Monthly_Total - Previous_Month_Total) / Previous_Month_Total) * 100, 
+            ((Monthly_Total - Previous_Month_Total) / Previous_Month_Total) * 100,
             2
-        ) 
+        )
     END AS Growth_Percent
 FROM monthly_sales;
 ```
+
 ### 2. **Product Line Market Share by City**  
 ```sql
 -- Nested Aggregation with Window Functions
 WITH city_sales AS (
-    SELECT 
-        City, 
-        Product_line, 
+    SELECT
+        City,
+        Product_line,
         SUM(Total) AS Product_Revenue,
-        SUM(SUM(Total)) OVER (PARTITION BY City) AS City_Total_Revenue 
+        SUM(SUM(Total)) OVER (PARTITION BY City) AS City_Total_Revenue
     FROM dbo.[WalmartSalesData.csv]
-    GROUP BY City, Product_line 
+    GROUP BY City, Product_line
 )
-SELECT 
-    City, 
-    Product_line, 
+SELECT
+    City,
+    Product_line,
     ROUND(
-        (Product_Revenue / City_Total_Revenue) * 100, 
+        (Product_Revenue / City_Total_Revenue) * 100,
         2
     ) AS Market_Share_Percent
 FROM city_sales
 ORDER BY City, Market_Share_Percent DESC;
-
 ```
-
 
 ### 3. **Gender-Based Product Preferences**
 ```sql
-
 -- Subquery + Ranking for Top 3 Products per Gender
 SELECT Gender, Product_line, Total_Qty
 FROM (
@@ -113,18 +123,14 @@ FROM (
         Gender,
         ROUND(SUM(Quantity), 2) AS Total_Qty,
         RANK() OVER (
-            PARTITION BY Gender 
+            PARTITION BY Gender
             ORDER BY SUM(Quantity) DESC
         ) AS Rank
     FROM dbo.[WalmartSalesData.csv]
     GROUP BY Product_line, Gender
-) ranked_data 
+) ranked_data
 WHERE Rank <= 3;
-
-
 ```
-
-
 
 ## 📈 Key Insights Highlight  
 - **Premium Members** generate **~15% more revenue** than regular customers.  
